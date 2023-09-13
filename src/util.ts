@@ -64,3 +64,9 @@ export const getModalValue = (data: APIModalSubmission, name: string) => {
 
 	return row.components[0].value;
 };
+
+export const getHwAsArray = async () => {
+	const url = `https://docs.google.com/document/d/${DOCUMENT_ID}/export?format=txt`;
+	const text = await fetch(url).then((res) => res.text());
+	return text.split(/(?:^|\n)(?=\d+\/)/).map((b) => b.trim());
+};
