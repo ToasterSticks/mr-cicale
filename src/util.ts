@@ -70,3 +70,11 @@ export const getHwAsArray = async () => {
 	const text = await fetch(url).then((res) => res.text());
 	return text.split(/(?:^|\n)(?=\d+\/)/).map((b) => b.trim());
 };
+
+export const getHwImageArray = async () => {
+	const url = `https://docs.google.com/document/d/${DOCUMENT_ID}/export?format=html`;
+	const text = await fetch(url).then((res) => res.text());
+	const chunks = text.split(/(?=>\d+\/\d+)/).slice(1);
+
+	return chunks.map((b) => [...b.matchAll(/src="(https:\/\/.+?)"/g)].map((match) => match[1]));
+};

@@ -4,7 +4,7 @@ import {
 	ApplicationCommandOptionType,
 } from 'discord-api-types/v10';
 import type { Command } from '../../http-interactions';
-import { getHwAsArray, getOption } from '../../util';
+import { getHwAsArray, getHwImageArray, getOption } from '../../util';
 
 export const command: Command<ApplicationCommandType.ChatInput> = {
 	name: 'hw',
@@ -19,11 +19,15 @@ export const command: Command<ApplicationCommandType.ChatInput> = {
 	],
 
 	exec: async ({ data: { options } }) => {
-		const data = await getHwAsArray();
+		const [texts, urls] = await Promise.all([getHwAsArray(), getHwImageArray()]);
+		const dateIdx = getOption<number>(options, 'date') ?? 0;
+
+		const content =
+			texts[dateIdx] + '\n\n' + (urls[dateIdx].length ? urls[dateIdx].join('\n') : '');
 
 		return {
 			type: InteractionResponseType.ChannelMessageWithSource,
-			data: { content: data[getOption<number>(options, 'date') ?? 0] },
+			data: { content },
 		};
 	},
 
