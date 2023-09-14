@@ -23,7 +23,11 @@ export const command: Command<ApplicationCommandType.ChatInput> = {
 		const dateIdx = getOption<number>(options, 'date') ?? 0;
 
 		const content =
-			texts[dateIdx] + '\n\n' + (urls[dateIdx].length ? urls[dateIdx].join('\n') : '');
+			texts[dateIdx] +
+			'\n\n' +
+			(urls[dateIdx].length
+				? urls[dateIdx].map((url, i) => `[[IMG ${i + 1}]](${url})`).join(' ')
+				: '');
 
 		return {
 			type: InteractionResponseType.ChannelMessageWithSource,
