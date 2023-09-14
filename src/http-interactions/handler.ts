@@ -1,4 +1,5 @@
 import type {
+	APIApplicationCommandAutocompleteInteraction,
 	APIApplicationCommandInteraction,
 	APIChatInputApplicationCommandInteraction,
 	APIMessageApplicationCommandInteraction,
@@ -50,6 +51,7 @@ export type Command<
 	>;
 	modal?: InteractionHandler<APIModalSubmitInteraction>;
 	components?: Record<string, InteractionHandler<APIMessageComponentInteraction>>;
+	autocomplete?: Record<string, InteractionHandler<APIApplicationCommandAutocompleteInteraction>>;
 };
 
 export interface Application {

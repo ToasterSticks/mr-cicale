@@ -1,3 +1,9 @@
+import type {
+	APIApplicationCommandInteractionDataIntegerOption,
+	APIApplicationCommandInteractionDataNumberOption,
+	APIApplicationCommandInteractionDataStringOption,
+} from 'discord-api-types/v10';
+
 declare global {
 	const CLIENT_ID: string;
 	const CLIENT_SECRET: string;
@@ -5,4 +11,7 @@ declare global {
 	const DOCUMENT_ID: string;
 }
 
-export {};
+export type APIApplicationCommandInteractionDataAutocompleteOption =
+	| APIApplicationCommandInteractionDataStringOption
+	| APIApplicationCommandInteractionDataIntegerOption
+	| APIApplicationCommandInteractionDataNumberOption;

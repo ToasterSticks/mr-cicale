@@ -5,11 +5,13 @@ import {
 	type APIMessageComponentInteraction,
 	type APIModalSubmitInteraction,
 	type RESTPostAPIInteractionFollowupJSONBody,
+	type APIApplicationCommandAutocompleteInteraction,
 } from 'discord-api-types/v10';
 import nacl from 'tweetnacl';
 import { Buffer } from 'buffer';
 import type { File, InteractionHandler, InteractionHandlerReturn } from './types';
 import type { CommandStore } from './handler';
+import type { APIApplicationCommandInteractionDataAutocompleteOption } from '../types';
 
 const makeValidator =
 	({ publicKey }: { publicKey: string }) =>
@@ -68,11 +70,12 @@ export const interaction = ({
 
 				let handler:
 					| InteractionHandler<APIApplicationCommandInteraction>
+					| InteractionHandler<APIApplicationCommandAutocompleteInteraction>
 					| InteractionHandler<APIMessageComponentInteraction>
 					| InteractionHandler<APIModalSubmitInteraction>
 					| undefined;
 
-				const customIdRestArgs: string[] = [];
+				const restArgs: any[] = [];
 
 				switch (interaction.type) {
 					case InteractionType.Ping: {
@@ -87,6 +90,24 @@ export const interaction = ({
 						break;
 					}
 
+					case InteractionType.ApplicationCommandAutocomplete: {
+						if (!interaction.data?.name) break;
+
+						const command = commands.get(interaction.data.name);
+						if (command?.autocomplete) {
+							const option = interaction.data.options
+								.filter(
+									(option): option is APIApplicationCommandInteractionDataAutocompleteOption =>
+										'focused' in option
+								)
+								.find(({ focused }) => focused == true);
+
+							if (option) handler = command.autocomplete[option.name];
+							restArgs.push(option);
+						}
+						break;
+					}
+
 					case InteractionType.MessageComponent: {
 						const commandInteraction = interaction.message.interaction;
 						if (!commandInteraction) break;
@@ -94,7 +115,7 @@ export const interaction = ({
 						const command = commands.get(commandInteraction.name.split(' ')[0]);
 						if (command?.components) {
 							const [name, ...args] = interaction.data.custom_id.split(':');
-							customIdRestArgs.push(...args);
+							restArgs.push(args);
 							handler = command.components[name];
 						}
 						break;
@@ -102,7 +123,7 @@ export const interaction = ({
 
 					case InteractionType.ModalSubmit: {
 						const [name, ...args] = interaction.data.custom_id.split(':');
-						customIdRestArgs.push(...args);
+						restArgs.push(args);
 						const command = commands.get(name);
 						if (command?.modal) handler = command.modal;
 						break;
@@ -115,7 +136,7 @@ export const interaction = ({
 
 				const response = await (handler as InteractionHandler<APIApplicationCommandInteraction>)(
 					interaction as APIApplicationCommandInteraction,
-					customIdRestArgs
+					...restArgs
 				);
 
 				return createResponse(response);
