@@ -12,17 +12,28 @@ import {
 export const mapFiles = <T>(context: __WebpackModuleApi.RequireContext) =>
 	context.keys().map<T>((path) => context(path).command);
 
-export const request = (route: string, method: string, body: FormData | unknown) => {
+export const noop = () => null;
+
+export const restApiRequest = <T = null>(
+	route: string,
+	method: string,
+	body?: FormData | unknown
+): Promise<T | null> => {
 	const requestOptions =
 		body instanceof FormData
 			? { method, body }
 			: {
 					method,
-					headers: { 'Content-Type': 'application/json' },
+					headers: {
+						'Content-Type': 'application/json',
+						Authorization: `Bot ${BOT_TOKEN}`,
+					},
 					body: JSON.stringify(body),
 			  };
 
-	fetch(RouteBases.api + route, requestOptions);
+	return fetch(RouteBases.api + route, requestOptions)
+		.then((res) => (res.ok ? (res.json() as T) : null))
+		.catch(noop);
 };
 
 export const deferUpdate = (): APIInteractionResponse => ({
@@ -31,10 +42,7 @@ export const deferUpdate = (): APIInteractionResponse => ({
 
 export const getOption = <
 	T extends
-		| string
-		| number
-		| boolean
-		| APIApplicationCommandInteractionDataBasicOption[]
+		| APIApplicationCommandInteractionDataBasicOption['value']
 		| APIApplicationCommandInteractionDataSubcommandOption[],
 	R extends boolean = false
 >(
@@ -78,3 +86,12 @@ export const getHwImageArray = async () => {
 
 	return chunks.map((b) => [...b.matchAll(/src="(https:\/\/.+?)"/g)].map((match) => match[1]));
 };
+
+export const canvasFetch = <T>(route: string, options?: Parameters<typeof fetch>[1]): Promise<T> =>
+	fetch(CANVAS_API_DOMAIN + route, {
+		...options,
+		headers: { Authorization: `Bearer ${CANVAS_API_TOKEN}` },
+	}).then((res) => res.json());
+
+export const compareCaseInsensitive = (str1: string, str2: string) =>
+	str1.toLowerCase().includes(str2.toLowerCase());

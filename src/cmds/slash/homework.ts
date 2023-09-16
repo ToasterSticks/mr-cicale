@@ -23,7 +23,7 @@ export const command: Command<ApplicationCommandType.ChatInput> = {
 		const dateIdx = getOption<number>(options, 'date') ?? 0;
 
 		const content =
-			texts[dateIdx] +
+			texts[dateIdx].replaceAll(/\n\s*\n+/g, '\n\n') +
 			'\n\n' +
 			(urls[dateIdx].length
 				? urls[dateIdx].map((url, i) => `[[IMG ${i + 1}]](${url})`).join(' ')
@@ -40,16 +40,16 @@ export const command: Command<ApplicationCommandType.ChatInput> = {
 			const data = await getHwAsArray();
 			const dates = data
 				.map((block) => block.match(/\d+\/\d+/)?.[0])
-				.filter((date): date is string =>
-					date !== undefined && a
-						? stripDateZeroes(date).startsWith(stripDateZeroes(a.value.toString()))
-						: true
+				.filter(
+					(date): date is string =>
+						date !== undefined &&
+						stripDateZeroes(date).startsWith(stripDateZeroes(a.value.toString()))
 				)
 				.slice(0, 25);
 
 			return {
 				type: InteractionResponseType.ApplicationCommandAutocompleteResult,
-				data: { choices: dates.slice(0, 25).map((name, value) => ({ name, value })) },
+				data: { choices: dates.map((name, value) => ({ name, value })) },
 			};
 		},
 	},

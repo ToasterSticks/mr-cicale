@@ -21,6 +21,6 @@ export type InteractionHandler<T extends APIInteraction = APIInteraction> = (
 	...extra: T extends APIModalSubmitInteraction | APIMessageComponentInteraction
 		? [string[], ...any]
 		: T extends APIApplicationCommandAutocompleteInteraction
-		? [APIApplicationCommandInteractionDataAutocompleteOption, any]
+		? [APIApplicationCommandInteractionDataAutocompleteOption, ...any]
 		: any[]
 ) => InteractionHandlerReturn | Promise<InteractionHandlerReturn>;
