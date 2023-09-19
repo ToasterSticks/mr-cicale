@@ -7,4 +7,4 @@ workers_dev = true
   command = "yarn install && yarn build"
 
 [triggers]
-  crons = ["*	22	*	*	*	"]
+  crons = ["0	22	*	*	*	"]
