@@ -19,17 +19,19 @@ addEventListener('fetch', (event) => {
 addEventListener('scheduled', async (event) => {
 	event.waitUntil(new Promise(() => null));
 
+	const date = new Date(event.scheduledTime);
+	const dd = String(date.getDate()).padStart(2, '0');
+	const mm = String(date.getMonth() + 1).padStart(2, '0');
+	const yy = String(date.getFullYear() % 100).padStart(2, '0');
+
 	const [texts, urls] = await Promise.all([getHwAsArray(), getHwImageArray()]);
+
+	if (texts[0].match(/\d+\/\d+/)?.[0] !== `${mm}/${dd}`) return;
 
 	const content =
 		texts[0] +
 		'\n\n' +
 		(urls[0].length ? urls[0].map((url, i) => `[[IMG ${i + 1}]](${url})`).join(' ') : '');
-
-	const date = new Date(event.scheduledTime);
-	const dd = String(date.getDate()).padStart(2, '0');
-	const mm = String(date.getMonth() + 1).padStart(2, '0');
-	const yy = String(date.getFullYear() % 100).padStart(2, '0');
 
 	restApiRequest(Routes.threads(FORUM_CHANNEL), 'POST', {
 		name: `${mm}/${dd}/${yy} Homework`,
