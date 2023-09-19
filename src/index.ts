@@ -32,7 +32,7 @@ addEventListener('scheduled', async (event) => {
 	const yy = String(date.getFullYear() % 100).padStart(2, '0');
 
 	restApiRequest(Routes.threads(FORUM_CHANNEL), 'POST', {
-		name: `${dd}/${mm}/${yy} Homework`,
+		name: `${mm}/${dd}/${yy} Homework`,
 		auto_archive_duration: 10080,
 		applied_tags: ['1152408970577850408'],
 		message: { content },
