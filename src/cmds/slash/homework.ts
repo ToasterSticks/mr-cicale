@@ -23,7 +23,7 @@ export const command: Command<ApplicationCommandType.ChatInput> = {
 		const dateIdx = getOption<number>(options, 'date') ?? 0;
 
 		const content =
-			texts[dateIdx].replaceAll(/\n\s*\n+/g, '\n\n') +
+			texts[dateIdx] +
 			'\n\n' +
 			(urls[dateIdx].length
 				? urls[dateIdx].map((url, i) => `[[IMG ${i + 1}]](${url})`).join(' ')

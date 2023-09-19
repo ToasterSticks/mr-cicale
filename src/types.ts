@@ -13,6 +13,7 @@ declare global {
 	const CANVAS_API_DOMAIN: string;
 	const CANVAS_API_TOKEN: string;
 	const CANVAS_COURSE_ID: string;
+	const FORUM_CHANNEL: string;
 }
 
 export type APIApplicationCommandInteractionDataAutocompleteOption =
