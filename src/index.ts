@@ -29,14 +29,14 @@ addEventListener('scheduled', async (event) => {
 	if (texts[0].match(/\d+\/\d+/)?.[0] !== `${mm}/${dd}`) return;
 
 	const content =
-		'@everyone ' +
+		`<@&${ALL_ROLE_ID}> ` +
 		texts[0] +
 		'\n\n' +
 		(urls[0].length ? urls[0].map((url, i) => `[[IMG ${i + 1}]](${url})`).join(' ') : '');
 
 	restApiRequest(Routes.threads(FORUM_CHANNEL), 'POST', {
 		name: `${mm}/${dd}/${yy} Homework`,
-		applied_tags: ['1152408970577850408'],
+		applied_tags: [HOMEWORK_FORUM_TAG],
 		message: { content },
 	});
 });
