@@ -3,8 +3,10 @@ main        = "dist/worker.js"
 name        = "mr-cicale"
 workers_dev = true
 
+kv_namespaces = [{ binding = "CACHE", id = "372000630b084fe18c2687cd313e3837" }]
+
 [build]
   command = "yarn install && yarn build"
 
 [triggers]
-  crons = ["0 22 * * 1,2,3,4,5"]
+  crons = ["*/5 0,1,2,3,20,21,22,23 * * 1,2,3,4,5"]

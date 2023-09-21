@@ -16,6 +16,7 @@ declare global {
 	const FORUM_CHANNEL: string;
 	const HOMEWORK_FORUM_TAG: string;
 	const ALL_ROLE_ID: string;
+	const CACHE: KVNamespace;
 }
 
 export type APIApplicationCommandInteractionDataAutocompleteOption =

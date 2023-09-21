@@ -19,18 +19,26 @@ addEventListener('fetch', (event) => {
 addEventListener('scheduled', async (event) => {
 	event.waitUntil(new Promise(() => null));
 
-	const date = new Date(event.scheduledTime);
+	const date = new Date(event.scheduledTime - 14400000); // Subtract 4 hours for UTC → EST
 	const dd = String(date.getDate()).padStart(2, '0');
 	const mm = String(date.getMonth() + 1).padStart(2, '0');
 	const yy = String(date.getFullYear() % 100).padStart(2, '0');
 
 	const [texts, urls] = await Promise.all([getHwAsArray(), getHwImageArray()]);
+	const latest = texts[0];
 
-	if (texts[0].match(/\d+\/\d+/)?.[0] !== `${mm}/${dd}`) return;
+	if (latest.match(/\d+\/\d+/)?.[0] !== `${mm}/${dd}`) return;
+
+	if ((await CACHE.get('content')) !== latest)
+		await Promise.all([CACHE.put('edited_at', date.toString()), CACHE.put('content', latest)]);
+
+	const lastEdited = (await CACHE.get('edited_at'))!;
+
+	if (date.getTime() - new Date(lastEdited).getTime() < 600000) return;
 
 	const content =
 		`<@&${ALL_ROLE_ID}> ` +
-		texts[0] +
+		latest +
 		'\n\n' +
 		(urls[0].length ? urls[0].map((url, i) => `[[IMG ${i + 1}]](${url})`).join(' ') : '');
 
