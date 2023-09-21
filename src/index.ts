@@ -24,6 +24,10 @@ addEventListener('scheduled', async (event) => {
 	const mm = String(date.getMonth() + 1).padStart(2, '0');
 	const yy = String(date.getFullYear() % 100).padStart(2, '0');
 
+	const latestPost = (await CACHE.get('latest_post'))!;
+
+	if (latestPost === `${mm}/${dd}/${yy}`) return;
+
 	const [texts, urls] = await Promise.all([getHwAsArray(), getHwImageArray()]);
 	const latest = texts[0];
 
@@ -35,6 +39,8 @@ addEventListener('scheduled', async (event) => {
 	const lastEdited = (await CACHE.get('edited_at'))!;
 
 	if (date.getTime() - new Date(lastEdited).getTime() < 600000) return;
+
+	CACHE.put('latest_post', `${mm}/${dd}/${yy}`);
 
 	const content =
 		`<@&${ALL_ROLE_ID}> ` +
