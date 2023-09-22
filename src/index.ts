@@ -51,6 +51,7 @@ addEventListener('scheduled', async (event) => {
 	restApiRequest(Routes.threads(FORUM_CHANNEL), 'POST', {
 		name: `${mm}/${dd}/${yy} Homework`,
 		applied_tags: [HOMEWORK_FORUM_TAG],
+		auto_archive_duration: 1440,
 		message: { content },
 	});
 });
