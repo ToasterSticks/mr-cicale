@@ -40,18 +40,18 @@ addEventListener('scheduled', async (event) => {
 
 	if (date.getTime() - new Date(lastEdited).getTime() < 600000) return;
 
-	CACHE.put('latest_post', `${mm}/${dd}/${yy}`);
-
 	const content =
 		`<@&${ALL_ROLE_ID}> ` +
 		latest +
 		'\n\n' +
 		(urls[0].length ? urls[0].map((url, i) => `[[IMG ${i + 1}]](${url})`).join(' ') : '');
 
-	restApiRequest(Routes.threads(FORUM_CHANNEL), 'POST', {
+	const thread = await restApiRequest(Routes.threads(FORUM_CHANNEL), 'POST', {
 		name: `${mm}/${dd}/${yy} Homework`,
 		applied_tags: [HOMEWORK_FORUM_TAG],
 		auto_archive_duration: 1440,
 		message: { content },
 	});
+
+	if (thread) await CACHE.put('latest_post', `${mm}/${dd}/${yy}`);
 });
