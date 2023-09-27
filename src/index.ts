@@ -19,26 +19,33 @@ addEventListener('fetch', (event) => {
 addEventListener('scheduled', async (event) => {
 	event.waitUntil(new Promise(() => null));
 
-	const date = new Date(event.scheduledTime - 14400000); // Subtract 4 hours for UTC → EST
-	const dd = String(date.getDate()).padStart(2, '0');
-	const mm = String(date.getMonth() + 1).padStart(2, '0');
-	const yy = String(date.getFullYear() % 100).padStart(2, '0');
+	const date = new Date(event.scheduledTime - 14400000);
+	const mmdd =
+		String(date.getMonth() + 1).padStart(2, '0') + '/' + String(date.getDate()).padStart(2, '0');
 
-	const latestPost = (await CACHE.get('latest_post'))!;
+	const promises = await Promise.all([
+		CACHE.get('edited_at'),
+		CACHE.get('latest_post'),
+		CACHE.get('content'),
+		getHwAsArray(),
+		getHwImageArray(),
+	]);
 
-	if (latestPost === `${mm}/${dd}/${yy}`) return;
+	let lastEdited = new Date(promises[0]!).getTime();
+	const [, latestPost, latestContent, texts, urls] = promises;
 
-	const [texts, urls] = await Promise.all([getHwAsArray(), getHwImageArray()]);
+	if (latestPost! === mmdd) return;
+
 	const latest = texts[0];
 
-	if (latest.match(/\d+\/\d+/)?.[0] !== `${mm}/${dd}`) return;
+	if (latest.match(/\d+\/\d+/)?.[0] !== mmdd) return;
 
-	if ((await CACHE.get('content')) !== latest)
+	if (latestContent !== latest) {
 		await Promise.all([CACHE.put('edited_at', date.toString()), CACHE.put('content', latest)]);
+		lastEdited = date.getTime();
+	}
 
-	const lastEdited = (await CACHE.get('edited_at'))!;
-
-	if (date.getTime() - new Date(lastEdited).getTime() < 600000) return;
+	if (date.getTime() - lastEdited < 600000) return;
 
 	const content =
 		`<@&${ALL_ROLE_ID}> ` +
@@ -47,11 +54,11 @@ addEventListener('scheduled', async (event) => {
 		(urls[0].length ? urls[0].map((url, i) => `[[IMG ${i + 1}]](${url})`).join(' ') : '');
 
 	const thread = await restApiRequest(Routes.threads(FORUM_CHANNEL), 'POST', {
-		name: `${mm}/${dd}/${yy} Homework`,
+		name: `${mmdd} Homework`,
 		applied_tags: [HOMEWORK_FORUM_TAG],
 		auto_archive_duration: 1440,
 		message: { content },
 	});
 
-	if (thread) await CACHE.put('latest_post', `${mm}/${dd}/${yy}`);
+	if (thread) await CACHE.put('latest_post', mmdd);
 });
