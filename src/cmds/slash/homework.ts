@@ -4,7 +4,7 @@ import {
 	ApplicationCommandOptionType,
 } from 'discord-api-types/v10';
 import type { Command } from '../../http-interactions';
-import { getHwAsArray, getHwImageArray, getOption } from '../../util';
+import { ONENOTE_BUTTON_AR, getHwAsArray, getHwImageArray, getOption } from '../../util';
 
 export const command: Command<ApplicationCommandType.ChatInput> = {
 	name: 'hw',
@@ -31,7 +31,10 @@ export const command: Command<ApplicationCommandType.ChatInput> = {
 
 		return {
 			type: InteractionResponseType.ChannelMessageWithSource,
-			data: { content },
+			data: {
+				content,
+				components: [ONENOTE_BUTTON_AR],
+			},
 		};
 	},
 

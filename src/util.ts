@@ -2,11 +2,15 @@ import {
 	ApplicationCommandOptionType,
 	InteractionResponseType,
 	RouteBases,
+	ComponentType,
+	ButtonStyle,
 	type APIApplicationCommandInteractionDataBasicOption,
 	type APIApplicationCommandInteractionDataOption,
 	type APIApplicationCommandInteractionDataSubcommandOption,
 	type APIInteractionResponse,
 	type APIModalSubmission,
+	type APIActionRowComponent,
+	type APIMessageActionRowComponent,
 } from 'discord-api-types/v10';
 
 export const mapFiles = <T>(context: __WebpackModuleApi.RequireContext) =>
@@ -95,3 +99,20 @@ export const canvasFetch = <T>(route: string, options?: Parameters<typeof fetch>
 
 export const compareCaseInsensitive = (str1: string, str2: string) =>
 	str1.toLowerCase().includes(str2.toLowerCase());
+
+export const ONENOTE_BUTTON_AR: APIActionRowComponent<APIMessageActionRowComponent> = {
+	type: ComponentType.ActionRow,
+	components: [
+		{
+			type: ComponentType.Button,
+			style: ButtonStyle.Link,
+			label: 'OneNote',
+			url: ONENOTE_URL,
+			emoji: {
+				name: 'OneNote',
+				id: '569891378276990987',
+				animated: false,
+			},
+		},
+	],
+};

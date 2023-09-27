@@ -1,6 +1,6 @@
 import { Routes } from 'discord-api-types/v10';
 import { createApplicationCommandHandler, type Command } from './http-interactions';
-import { getHwAsArray, getHwImageArray, mapFiles, restApiRequest } from './util';
+import { ONENOTE_BUTTON_AR, getHwAsArray, getHwImageArray, mapFiles, restApiRequest } from './util';
 
 const commands = mapFiles<Command>(require.context('./cmds', true, /\.ts$/));
 
@@ -57,7 +57,10 @@ addEventListener('scheduled', async (event) => {
 		name: `${mmdd} Homework`,
 		applied_tags: [HOMEWORK_FORUM_TAG],
 		auto_archive_duration: 1440,
-		message: { content },
+		message: {
+			content,
+			components: [ONENOTE_BUTTON_AR],
+		},
 	});
 
 	if (thread) await CACHE.put('latest_post', mmdd);
