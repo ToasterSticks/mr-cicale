@@ -20,7 +20,7 @@ export const noop = () => null;
 
 export const restApiRequest = <T = null>(
 	route: string,
-	method: 'GET' | 'POST' | 'PUT' | 'DELETE',
+	method: 'GET' | 'POST' | 'PUT' | 'DELETE' | 'PATCH',
 	body?: FormData | unknown
 ): Promise<T | null> => {
 	const requestOptions =

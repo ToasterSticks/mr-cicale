@@ -9,4 +9,4 @@ kv_namespaces = [{ binding = "CACHE", id = "372000630b084fe18c2687cd313e3837" }]
   command = "yarn install && yarn build"
 
 [triggers]
-  crons = ["*/5 0-3,16-23 * * *"]
+  crons = ["*/5 0-2,18-23 * * *"]
