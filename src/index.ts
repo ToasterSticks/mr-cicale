@@ -33,6 +33,7 @@ addEventListener('scheduled', async (event) => {
 
 	let lastEdited = new Date(promises[0]!).getTime();
 	const [, latestPost, latestContent, texts, urls] = promises;
+	if (latestPost === mmdd) return;
 
 	const latest = texts[0];
 
@@ -44,33 +45,25 @@ addEventListener('scheduled', async (event) => {
 	}
 
 	const elapsedTime = date.getTime() - lastEdited;
-	if (360000 > elapsedTime || elapsedTime > 840000) return;
+	if (elapsedTime < 540000) return;
 
 	const content =
 		`<@&${ALL_ROLE_ID}> ` +
 		latest +
 		(urls[0].length ? '\n\n' + urls[0].map((url, i) => `[[IMG ${i + 1}]](${url})`).join(' ') : '');
 
-	if (latestPost === mmdd) {
-		const threads = await restApiRequest<APIThreadChannel[]>(
-			Routes.channelThreads(FORUM_CHANNEL, 'public'),
-			'GET'
-		);
+	const thread = await restApiRequest<APIThreadChannel>(Routes.threads(FORUM_CHANNEL), 'POST', {
+		name: `${mmdd} Homework`,
+		applied_tags: [HOMEWORK_FORUM_TAG],
+		auto_archive_duration: 1440,
+		message: {
+			content,
+			components: [ONENOTE_BUTTON_AR],
+		},
+	});
 
-		const id = threads?.find((thread) => thread.name?.startsWith(mmdd))?.id;
-		if (id) await restApiRequest(Routes.channelMessage(id, id), 'PATCH', { message: { content } });
-	} else {
+	if (thread) {
 		await CACHE.put('latest_post', mmdd);
-		const thread = await restApiRequest<APIThreadChannel>(Routes.threads(FORUM_CHANNEL), 'POST', {
-			name: `${mmdd} Homework`,
-			applied_tags: [HOMEWORK_FORUM_TAG],
-			auto_archive_duration: 1440,
-			message: {
-				content,
-				components: [ONENOTE_BUTTON_AR],
-			},
-		});
-
-		if (thread) restApiRequest(Routes.channelPin(thread.id, thread.id), 'PUT');
+		restApiRequest(Routes.channelPin(thread.id, thread.id), 'PUT');
 	}
 });
